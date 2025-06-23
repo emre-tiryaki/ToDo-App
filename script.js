@@ -19,34 +19,84 @@ async function updateLocalStorage(){
 
 // write the saved data
 function writeData(){
-    ToDo.forEach(value => {
-        new_chore = document.createElement('div');
-        new_chore.classList.add('chore');
-        new_chore.innerHTML = `<h3 id="chore-header">${value.header}</h3>
-                        <button id="delete-button">Delete</button>
-                        <button id="finish-button">Finish</button>
-                        <p id="chore-description">${value.description}</p>`;
-
-        ToDoContainer.append(new_chore);
-    });
-
-    Finished.forEach(value => {
-        new_chore = document.createElement('div');
-        new_chore.classList.add('chore');
-        new_chore.innerHTML = `<h3 id="chore-header">${value.header}</h3>
-                        <button id="delete-button">Delete</button>
-                        <button id="finish-button">Finish</button>
-                        <p id="chore-description">${value.description}</p>`;
-
-        ToDoContainer.append(new_chore);
-    });
-
+    ToDo.forEach(value => addToDo(value));
+    Finished.forEach(value => addFinished(value));
     console.log("Data writed");
+}
+
+// adding data to the ToDo div
+function addToDo(value){
+    new_chore = document.createElement('div');
+    new_chore.classList.add('chore');
+
+    header = document.createElement('h3');
+    header.id = 'chore-header';
+    header.textContent = value.header;
+
+    finish_button = document.createElement('button');
+    finish_button.id = 'finish-button';
+    finish_button.textContent = "Finish";
+    finish_button.addEventListener('click', () => {
+            ToDo.splice(ToDo.indexOf(value), 1);
+            Finished.push(value);
+            updateLocalStorage();
+            finish_button.parentNode.remove();
+            addFinished(value);
+    });
+
+    delete_button = document.createElement('button');
+    delete_button.id = 'delete-button';
+    delete_button.textContent = "Delete";
+    delete_button.addEventListener('click', () => {
+            delete_button.parentNode.remove();
+            ToDo.splice(ToDo.indexOf(value), 1);
+            updateLocalStorage();
+    });
+
+    description = document.createElement('p');
+    description.id = 'chore-description';
+    description.textContent = value.description;
+
+    new_chore.append(header);
+    new_chore.append(finish_button);
+    new_chore.append(delete_button);
+    new_chore.append(description);
+
+    ToDoContainer.append(new_chore);
+}
+
+// add Data to the Finished div
+function addFinished(value){
+    new_chore = document.createElement('div');
+    new_chore.classList.add('chore');
+
+    header = document.createElement('h3');
+    header.id = 'chore-header';
+    header.textContent = value.header;
+
+    delete_button = document.createElement('button');
+    delete_button.id = 'delete-button';
+    delete_button.textContent = "Delete";
+    delete_button.addEventListener('click', () => {
+            delete_button.parentNode.remove();
+            Finished.splice(Finished.indexOf(value), 1);
+            updateLocalStorage();
+    });
+
+    description = document.createElement('p');
+    description.id = 'chore-description';
+    description.textContent = value.description;
+
+    new_chore.append(header);
+    new_chore.append(delete_button);
+    new_chore.append(description);
+
+    FinishedContainer.append(new_chore);
 }
 
 // if there is a chore write it
 if(ToDo.length !== 0 || Finished.length !== 0)
-    writeData()
+    writeData();
 
 // add chore buttons event handler
 add_btn.addEventListener('click', () => {
@@ -57,14 +107,7 @@ add_btn.addEventListener('click', () => {
 
     ToDo.push(chore);
 
-    new_chore = document.createElement('div');
-    new_chore.classList.add('chore');
-    new_chore.innerHTML = `<h3 id="chore-header">${chore.header}</h3>
-                    <button id="delete-button">Delete</button>
-                    <button id="finish-button">Finish</button>
-                    <p id="chore-description">${chore.description}</p>`;
-
-    ToDoContainer.append(new_chore);
+    addToDo(chore);
 
     updateLocalStorage();
 
